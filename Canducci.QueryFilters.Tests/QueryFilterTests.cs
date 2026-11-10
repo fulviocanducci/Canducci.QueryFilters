@@ -10,13 +10,13 @@ namespace Canducci.QueryFilters.Tests
             var filter = QueryFilter.Create()
                 .Where("Name", FilterOperator.Contains, "Fulvio");
 
-            Assert.Single(filter.Conditions);
+            Assert.Single(filter.Root.Items);
 
-            var condition = filter.Conditions[0];
+            var condition = filter.Root.Items[0];
 
-            Assert.Equal("Name", condition.Field);
-            Assert.Equal(FilterOperator.Contains, condition.Operator);
-            Assert.Equal("Fulvio", condition.Value);
+            Assert.Equal("Name", condition.Condition.Field);
+            Assert.Equal(FilterOperator.Contains, condition.Condition.Operator);
+            Assert.Equal("Fulvio", condition.Condition.Value);
             Assert.Equal("AND", condition.LogicalOperator);
         }
 
@@ -27,13 +27,13 @@ namespace Canducci.QueryFilters.Tests
                 .Where("Name", FilterOperator.Equal, "Fulvio")
                 .And("Active", FilterOperator.Equal, true);
 
-            Assert.Equal(2, filter.Conditions.Count);
+            Assert.Equal(2, filter.Root.Items.Count);
 
-            var condition = filter.Conditions[1];
+            var condition = filter.Root.Items[1];
 
-            Assert.Equal("Active", condition.Field);
-            Assert.Equal(FilterOperator.Equal, condition.Operator);
-            Assert.Equal(true, condition.Value);
+            Assert.Equal("Active", condition.Condition.Field);
+            Assert.Equal(FilterOperator.Equal, condition.Condition.Operator);
+            Assert.Equal(true, condition.Condition.Value);
             Assert.Equal("AND", condition.LogicalOperator);
         }
 
@@ -44,13 +44,13 @@ namespace Canducci.QueryFilters.Tests
                 .Where("Name", FilterOperator.Equal, "Fulvio")
                 .Or("Age", FilterOperator.GreaterThan, 18);
 
-            Assert.Equal(2, filter.Conditions.Count);
+            Assert.Equal(2, filter.Root.Items.Count);
 
-            var condition = filter.Conditions[1];
+            var condition = filter.Root.Items[1];
 
-            Assert.Equal("Age", condition.Field);
-            Assert.Equal(FilterOperator.GreaterThan, condition.Operator);
-            Assert.Equal(18, condition.Value);
+            Assert.Equal("Age", condition.Condition.Field);
+            Assert.Equal(FilterOperator.GreaterThan, condition.Condition.Operator);
+            Assert.Equal(18, condition.Condition.Value);
             Assert.Equal("OR", condition.LogicalOperator);
         }
 
@@ -62,15 +62,36 @@ namespace Canducci.QueryFilters.Tests
                 .And("Active", FilterOperator.Equal, true)
                 .Or("Age", FilterOperator.GreaterThan, 18);
 
-            Assert.Equal(3, filter.Conditions.Count);
+            Assert.Equal(3, filter.Root.Items.Count);
 
-            Assert.Equal("Name", filter.Conditions[0].Field);
-            Assert.Equal("Active", filter.Conditions[1].Field);
-            Assert.Equal("Age", filter.Conditions[2].Field);
+            Assert.Equal("Name", filter.Root.Items[0].Condition.Field);
+            Assert.Equal("Active", filter.Root.Items[1].Condition.Field);
+            Assert.Equal("Age", filter.Root.Items[2].Condition.Field);
 
-            Assert.Equal("AND", filter.Conditions[0].LogicalOperator);
-            Assert.Equal("AND", filter.Conditions[1].LogicalOperator);
-            Assert.Equal("OR", filter.Conditions[2].LogicalOperator);
+            Assert.Equal("AND", filter.Root.Items[0].LogicalOperator);
+            Assert.Equal("AND", filter.Root.Items[1].LogicalOperator);
+            Assert.Equal("OR", filter.Root.Items[2].LogicalOperator);
         }
+
+        [Fact]
+        public void Compile_Should_Not_Reuse_Parameters_Between_Executions()
+        {
+            var compiler = new QueryFilterCompiler();
+
+            var first = compiler.Compile(
+                QueryFilter.Create()
+                    .Where("Name", FilterOperator.Equal, "Fulvio"));
+
+            var second = compiler.Compile(
+                QueryFilter.Create()
+                    .Where("Age", FilterOperator.GreaterThan, 18));
+
+            Assert.Equal("Name = @p0", first.Sql);
+            Assert.Equal("Age > @p0", second.Sql);
+
+            Assert.Single(first.Parameters);
+            Assert.Single(second.Parameters);
+        }
+
     }
 }

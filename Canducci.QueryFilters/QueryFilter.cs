@@ -1,18 +1,18 @@
 ﻿using Canducci.QueryFilters.Models;
 using Canducci.QueryFilters.Operators;
-using System.Collections.Generic;
+using System;
 
 namespace Canducci.QueryFilters
 {
     public class QueryFilter
     {
-        private readonly List<FilterCondition> _conditions;
+        private readonly FilterGroup _root;
 
-        public IReadOnlyList<FilterCondition> Conditions => _conditions;
+        public FilterGroup Root => _root;
 
         private QueryFilter()
         {
-            _conditions = new List<FilterCondition>();
+            _root = new FilterGroup();
         }
 
         public static QueryFilter Create()
@@ -20,37 +20,54 @@ namespace Canducci.QueryFilters
             return new QueryFilter();
         }
 
-        public QueryFilter Where(string field, FilterOperator op, object value)
+        public static QueryFilter Create(Action<FilterGroup> configure)
         {
-            _conditions.Add(new FilterCondition
-            {
-                Field = field,
-                Operator = op,
-                Value = value,
-                LogicalOperator = "AND"
-            });
+            return new QueryFilter().Group(configure);
+        }
 
+        internal QueryFilter Where(string field, FilterOperator op, object value)
+        {
+            _root.Where(field, op, value);
             return this;
         }
 
-        public QueryFilter And(string field, FilterOperator op, object value)
+        internal QueryFilter Where(string field, FilterOperator op)
         {
-            return Where(field, op, value);
+            return Where(field, op, null);
         }
 
-        public QueryFilter Or(string field, FilterOperator op, object value)
+        internal QueryFilter And(string field, FilterOperator op)
         {
-            _conditions.Add(new FilterCondition
-            {
-                Field = field,
-                Operator = op,
-                Value = value,
-                LogicalOperator = "OR"
-            });
+            return And(field, op, null);
+        }
 
+        internal QueryFilter Or(string field, FilterOperator op)
+        {
+            return Or(field, op, null);
+        }
+
+        internal QueryFilter And(string field, FilterOperator op, object value)
+        {
+            _root.And(field, op, value);
+            return this;
+        }
+
+        internal QueryFilter Or(string field, FilterOperator op, object value)
+        {
+            _root.Or(field, op, value);
+            return this;
+        }
+
+        public QueryFilter Group(Action<FilterGroup> configure)
+        {
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
+
+            _root.Group(configure);
             return this;
         }
     }
-
 
 }
