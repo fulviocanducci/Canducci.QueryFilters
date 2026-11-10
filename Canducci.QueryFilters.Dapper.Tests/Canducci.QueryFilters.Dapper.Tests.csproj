@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Canducci.QueryFilters.ADO\Canducci.QueryFilters.ADO.csproj" />
     <ProjectReference Include="..\Canducci.QueryFilters.Dapper\Canducci.QueryFilters.Dapper.csproj" />
   </ItemGroup>
 
