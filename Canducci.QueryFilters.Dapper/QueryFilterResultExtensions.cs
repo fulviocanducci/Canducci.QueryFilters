@@ -40,7 +40,9 @@ namespace Canducci.QueryFilters.Dapper
             foreach (var parameter in result.Parameters)
             {
                 object value = parameter.Value;
-                DbType? dbType = value == null || value == DBNull.Value ? (DbType?)null : GetDbType(value.GetType());
+                DbType? dbType = value == null || value == DBNull.Value
+                    ? null
+                    : GetDbType(value.GetType());
                 parameters.Add(parameter.Key, value, dbType);
             }
             return parameters;
