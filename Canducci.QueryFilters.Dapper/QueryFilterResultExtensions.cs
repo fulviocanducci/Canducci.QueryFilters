@@ -45,5 +45,15 @@ namespace Canducci.QueryFilters.Dapper
             }
             return parameters;
         }
+
+        public static DynamicParameters ToDynamicParameters(this QueryFilter filter)
+        {
+            if (filter == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
+            return filter.Compile().ToDynamicParameters();
+        }
     }
 }

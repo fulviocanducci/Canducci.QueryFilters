@@ -51,6 +51,30 @@ namespace Canducci.QueryFilters.Dapper.Tests
         }
 
         [Fact]
+        public void ToDynamicParameters_ShouldCompileFilterAndExecuteQuery()
+        {
+            // Arrange
+            using (var database = new SqliteDatabaseFixture())
+            {
+                var filter = QueryFilter.Create()
+                    .WhereEquals("Name", "Fulvio")
+                    .AndGreaterThan("Age", 18);
+
+                var parameters = filter.ToDynamicParameters();
+                var result = filter.Compile();
+
+                // Act
+                var sql = $"SELECT * FROM Users WHERE {result.Sql}";
+                var users = database.Connection.Query<User>(sql, parameters).AsList();
+
+                // Assert
+                Assert.Single(users);
+                Assert.Equal("Fulvio", users[0].Name);
+                Assert.Equal(35, users[0].Age);
+            }
+        }
+
+        [Fact]
         public void ToDynamicParameters_ShouldExecuteQueryWithGroup()
         {
             // Arrange

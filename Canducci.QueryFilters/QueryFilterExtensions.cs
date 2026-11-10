@@ -1,9 +1,16 @@
-﻿using Canducci.QueryFilters.Operators;
+﻿using Canducci.QueryFilters.Models;
+using Canducci.QueryFilters.Operators;
 
 namespace Canducci.QueryFilters
 {
     public static class QueryFilterExtensions
     {
+
+        public static QueryFilterResult Compile(this QueryFilter filter)
+        {
+            return new QueryFilterCompiler().Compile(filter);
+        }
+
         #region Comparisons
 
         public static QueryFilter WhereEquals<T>(this QueryFilter filter, string field, T value)
