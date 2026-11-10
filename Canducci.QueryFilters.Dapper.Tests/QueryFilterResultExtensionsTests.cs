@@ -139,7 +139,6 @@ namespace Canducci.QueryFilters.Dapper.Tests
             using (var database = new SqliteDatabaseFixture())
             {
                 var filter = QueryFilter.Create(c => c.WhereEquals("Name", "Fulvio"));
-
                 var result = new QueryFilterCompiler().Compile(filter);
                 var parameters = result.ToDynamicParameters();
 

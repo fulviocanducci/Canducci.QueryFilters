@@ -2,7 +2,7 @@
 using System.Data;
 
 namespace Canducci.QueryFilters.Dapper
-{                    ]
+{
     internal static class Util
     {
         internal static DbType? GetTypeByValue(object value)
