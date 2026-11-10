@@ -1,0 +1,8 @@
+﻿Canducci.QueryFilters/
+├── Operators/
+│   └── FilterOperator.cs
+├── Models/
+│   ├── FilterCondition.cs
+│   └── QueryFilterResult.cs
+├── QueryFilter.cs
+└── QueryFilterCompiler.cs

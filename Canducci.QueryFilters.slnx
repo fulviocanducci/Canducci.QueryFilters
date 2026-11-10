@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Canducci.QueryFilters.Tests/Canducci.QueryFilters.Tests.csproj" />
+  <Project Path="Canducci.QueryFilters/Canducci.QueryFilters.csproj" />
+</Solution>
